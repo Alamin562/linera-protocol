@@ -54,8 +54,8 @@ const MAX_MULTI_KEYS: usize = 99;
 /// So, we set up the maximal size of 16 MB - 10 KB for the values and 10 KB for the keys
 /// We also arbitrarily decrease the size by 4000 bytes because an amount of size is
 /// taken internally by the database.
-const RAW_MAX_VALUE_SIZE: usize = 16762976;
-const MAX_KEY_SIZE: usize = 10240;
+const RAW_MAX_VALUE_SIZE: usize = 16 * 1024 * 1024;
+const MAX_KEY_SIZE: usize = 10 * 1024;
 const MAX_BATCH_TOTAL_SIZE: usize = RAW_MAX_VALUE_SIZE + MAX_KEY_SIZE;
 
 /// The `RAW_MAX_VALUE_SIZE` is the maximum size on the ScyllaDB storage.
@@ -824,7 +824,12 @@ impl AdminKeyValueStore for ScyllaDbStoreInternal {
         // The schema appears too complicated for non-trivial reasons.
         // See TODO(#1069).
         let query = format!(
-            "CREATE TABLE kv.{} (root_key blob, k blob, v blob, primary key (root_key, k))",
+            "CREATE TABLE kv.{} (
+                root_key blob,
+                k blob,
+                v blob,
+                PRIMARY KEY (root_key, k)
+            )",
             namespace
         );
 
